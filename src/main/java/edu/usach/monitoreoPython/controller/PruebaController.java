@@ -9,6 +9,7 @@ import edu.usach.monitoreoPython.model.Prueba;
 import edu.usach.monitoreoPython.repository.PruebaRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,28 +34,54 @@ public class PruebaController {
     private PruebaRepository pruebaRepository;
 
     @RequestMapping(value = "/all", method = GET)
-    public List<Prueba> list() {
-        return pruebaRepository.findAll();
+    public ResponseEntity<List<Prueba>> list() {
+        try {
+            List<Prueba> pruebas = pruebaRepository.findAll();
+            return ResponseEntity.ok(pruebas);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
     }
 
     @RequestMapping(value = "/{id}", method = GET)
-    public Prueba get(@PathVariable String id) {
-        return pruebaRepository.findOne(Long.parseLong(id));
+    public ResponseEntity<Prueba> get(@PathVariable String id) {
+        try {
+            Prueba prueba = pruebaRepository.findOne(Long.parseLong(id));
+            return ResponseEntity.ok(prueba);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @RequestMapping(value = "/{id}", method = PUT)
-    public ResponseEntity<?> put(@PathVariable String id, @RequestBody Object input) {
-        return null;
+    public ResponseEntity<?> put(@PathVariable String id, @RequestBody Prueba input) {
+        try {
+            Prueba prueba = pruebaRepository.findOne(Long.parseLong(id));
+            prueba.setArgumento(input.getArgumento());
+            prueba.setResultado(input.getResultado());
+            return ResponseEntity.ok(pruebaRepository.saveAndFlush(prueba));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(null);
+        }
     }
 
-    @RequestMapping(value = "/{id}", method = POST)
-    public ResponseEntity<?> post(@PathVariable String id, @RequestBody Object input) {
-        return null;
+    @RequestMapping(value = "/addPrueba", method = POST)
+    public ResponseEntity<?> post(@RequestBody Prueba input) {
+        try {
+            return ResponseEntity.ok(pruebaRepository.saveAndFlush(input));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(null);
+        }
     }
 
-    @RequestMapping(value = "/{id}", method = DELETE)
-    public ResponseEntity<Object> delete(@PathVariable String id) {
-        return null;
+    @RequestMapping(value = "/deletePrueba/{id}", method = DELETE)
+    public ResponseEntity<?> delete(@PathVariable String id) {
+        try {
+            pruebaRepository.delete(Long.parseLong(id));
+            return ResponseEntity.ok(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(null);
+        }
     }
 
 }

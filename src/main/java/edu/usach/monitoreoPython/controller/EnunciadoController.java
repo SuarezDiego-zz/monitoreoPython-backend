@@ -9,6 +9,7 @@ import edu.usach.monitoreoPython.model.Enunciado;
 import edu.usach.monitoreoPython.repository.EnunciadoRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,28 +34,53 @@ public class EnunciadoController {
     private EnunciadoRepository enunciadoRepository;
 
     @RequestMapping(value = "/all", method = GET)
-    public List<Enunciado> list() {
-        return enunciadoRepository.findAll();
+    public ResponseEntity<List<Enunciado>> list() {
+        try {
+            List<Enunciado> enunciados = enunciadoRepository.findAll();
+            return ResponseEntity.ok(enunciados);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
     }
 
     @RequestMapping(value = "/{id}", method = GET)
-    public Enunciado get(@PathVariable String id) {
-        return enunciadoRepository.findOne(Long.parseLong(id));
+    public ResponseEntity<Enunciado> get(@PathVariable String id) {
+        try {
+            Enunciado enunciado = enunciadoRepository.findOne(Long.parseLong(id));
+            return ResponseEntity.ok(enunciado);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @RequestMapping(value = "/{id}", method = PUT)
-    public ResponseEntity<?> put(@PathVariable String id, @RequestBody Object input) {
-        return null;
+    public ResponseEntity<?> put(@PathVariable String id, @RequestBody Enunciado input) {
+        try {
+            Enunciado enunciado = enunciadoRepository.findOne(Long.parseLong(id));
+            enunciado.setEnunciado(input.getEnunciado());
+            return ResponseEntity.ok(enunciadoRepository.saveAndFlush(enunciado));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(null);
+        }
     }
 
-    @RequestMapping(value = "/{id}", method = POST)
-    public ResponseEntity<?> post(@PathVariable String id, @RequestBody Object input) {
-        return null;
+    @RequestMapping(value = "/addEnunciado", method = POST)
+    public ResponseEntity<?> post(@RequestBody Enunciado input) {
+        try {
+            return ResponseEntity.ok(enunciadoRepository.saveAndFlush(input));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(null);
+        }
     }
 
-    @RequestMapping(value = "/{id}", method = DELETE)
-    public ResponseEntity<Object> delete(@PathVariable String id) {
-        return null;
+    @RequestMapping(value = "/deleteEnunciado/{id}", method = DELETE)
+    public ResponseEntity<?> delete(@PathVariable String id) {
+        try {
+            enunciadoRepository.delete(Long.parseLong(id));
+            return ResponseEntity.ok(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
 }

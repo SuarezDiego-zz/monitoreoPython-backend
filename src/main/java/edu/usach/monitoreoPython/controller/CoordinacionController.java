@@ -9,6 +9,7 @@ import edu.usach.monitoreoPython.model.Coordinacion;
 import edu.usach.monitoreoPython.repository.CoordinacionRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,28 +34,53 @@ public class CoordinacionController {
     private CoordinacionRepository coordinacionRepository;
 
     @RequestMapping(value = "/all", method = GET)
-    public List<Coordinacion> list() {
-        return coordinacionRepository.findAll();
+    public ResponseEntity<List<Coordinacion>> list() {
+        try {
+            List<Coordinacion> coordinaciones = coordinacionRepository.findAll();
+            return ResponseEntity.ok(coordinaciones);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
     }
 
     @RequestMapping(value = "/{id}", method = GET)
-    public Coordinacion get(@PathVariable String id) {
-        return coordinacionRepository.findOne(Long.parseLong(id));
+    public ResponseEntity<Coordinacion> get(@PathVariable String id) {
+        try {
+            Coordinacion coordinacion = coordinacionRepository.findOne(Long.parseLong(id));
+            return ResponseEntity.ok(coordinacion);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @RequestMapping(value = "/{id}", method = PUT)
-    public ResponseEntity<?> put(@PathVariable String id, @RequestBody Object input) {
-        return null;
+    public ResponseEntity<?> put(@PathVariable String id, @RequestBody Coordinacion input) {
+        try {
+            Coordinacion coordinacion = coordinacionRepository.findOne(Long.parseLong(id));
+            coordinacion.setUsuarios(input.getUsuarios());
+            return ResponseEntity.ok(coordinacionRepository.saveAndFlush(coordinacion));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(null);
+        }
     }
 
-    @RequestMapping(value = "/{id}", method = POST)
-    public ResponseEntity<?> post(@PathVariable String id, @RequestBody Object input) {
-        return null;
+    @RequestMapping(value = "/addCoordinacion", method = POST)
+    public ResponseEntity<?> post(@RequestBody Coordinacion input) {
+        try {
+            return ResponseEntity.ok(coordinacionRepository.saveAndFlush(input));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(null);
+        }
     }
 
-    @RequestMapping(value = "/{id}", method = DELETE)
-    public ResponseEntity<Object> delete(@PathVariable String id) {
-        return null;
+    @RequestMapping(value = "/deleteCoordinacion/{id}", method = DELETE)
+    public ResponseEntity<?> delete(@PathVariable String id) {
+        try {
+            coordinacionRepository.delete(Long.parseLong(id));
+            return ResponseEntity.ok(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(null);
+        }
     }
 
 }

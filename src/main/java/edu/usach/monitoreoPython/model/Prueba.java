@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -39,9 +40,11 @@ public class Prueba implements Serializable {
     private Long idPrueba;
 
     @Column(name = "argumento")
+    @NotNull
     private String argumento;
 
     @Column(name = "resultado")
+    @NotNull
     private String resultado;
 
     @ManyToOne
