@@ -20,7 +20,7 @@ VALUES
 ("Muestre la summatoria de los 10 primeros numeros naturales de forma iterativa"),
 ("Realice la funcion de fibonacci con 1 parametro de entrada"),
 ("Realice una funcion que calcule el factorial de 5"),
-("Genere una funcion que al pasar los lados de un triangulo, calcule su area")
+("Genere una funcion que al pasar los lados de un triangulo, calcule su area");
 
 -- Table Coordinacion --
 INSERT INTO
@@ -31,7 +31,7 @@ VALUES
 (3),
 (4),
 (5),
-(6)
+(6);
 
 -- Table Prueba --
 INSERT INTO
@@ -41,4 +41,4 @@ VALUES
 ("sumatoria(10)", "55", 2),
 ("fibonacci(4)", "3", 3),
 ("factorial(5)", "120", 4),
-("area(2, 2)", "2", 5)
+("area(2, 2)", "2", 5);
