@@ -7,6 +7,7 @@ package edu.usach.monitoreoPython.test;
 
 import edu.usach.monitoreoPython.controller.CoordinacionController;
 import edu.usach.monitoreoPython.model.Coordinacion;
+import edu.usach.monitoreoPython.repository.CoordinacionRepository;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -26,20 +27,34 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import org.springframework.http.MediaType;
 import java.nio.charset.Charset;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 /**
  *
  * @author Diego
  */
 
-
-public class test_unitarios {
-    private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-            MediaType.APPLICATION_JSON.getSubtype(),
-            Charset.forName("utf8"));
+@RunWith(SpringRunner.class)
+@WebMvcTest(value = CoordinacionController.class, secure = false)
+public class CoordinacionControllerTest {
+    @Autowired
     private MockMvc mockMvc;
-    //private List<Bookmark> bookmarkList = new ArrayList<>();
     
+    @MockBean
+    //private CoordinacionRepository coordinacionRepository;//funcionan todos
+    //private MonitoreoPythonApplication monitoreoPythonApplication;//no funciona
+    private CoordinacionController coordinacionController;//funciona el nuevo y los viejos no
+    /*
     public test_unitarios() {
     }
     
@@ -58,21 +73,12 @@ public class test_unitarios {
     @After
     public void tearDown() {
     }
-
+    */
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:
     //
     // @Test
     // public void hello() {}
-    /*
-    @Test
-    public void tes(){
-    int n1=1;
-    int n2=2;
-    int total=3;
-    //int sumas=AlumnoController.suma(n1,n2);
-    //Assert.assertEquals(sumas,total);
-    }*/
     @Test
     public void test_coordinacion_lista(){
         CoordinacionController cc= new CoordinacionController();
@@ -112,6 +118,32 @@ public class test_unitarios {
         Assert.assertNotEquals(HttpStatus.UNSUPPORTED_MEDIA_TYPE,get_prueba.getStatusCode());
     }
     
+    
+    Coordinacion mockCourse = new Coordinacion();
+    
+    @Test
+    public void crear_coordinacion() throws Exception {
+        String exampleCourseJson = "{\"idCoordinacion\":1,\"usuarios\":[]}";
+        CoordinacionController cc= new CoordinacionController();
+        Coordinacion coordinacion_prueba= new Coordinacion();
+        ResponseEntity<?> post_prueba=cc.post(coordinacion_prueba);
+		// studentService.addCourse to respond back with mockCourse
+        Mockito.when(
+				coordinacionController.addCoordinacion(Mockito.anyString(),
+						Mockito.any(Coordinacion.class))).thenReturn(mockCourse);
+        //Mockito.when(post_prueba);
+		// Send course as body to /students/Student1/courses
+	RequestBuilder requestBuilder = MockMvcRequestBuilders
+                        .post("/mingeso/coordinacion/")
+			.accept(MediaType.APPLICATION_JSON).content(exampleCourseJson)
+			.contentType(MediaType.APPLICATION_JSON);
+	MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+	MockHttpServletResponse response = result.getResponse();
+	assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+        assertEquals("http://localhost/mingeso/coordinacion/1",response.getHeader(HttpHeaders.LOCATION));
+    }
+        
+    /*
     @Test
     public void ccc() throws Exception {
         mockMvc.perform(get("/mingeso/coordinacion")
@@ -131,14 +163,5 @@ public class test_unitarios {
                 //.andExpect(jsonPath("$.uri", is("http://bookmark.com/1/" + userName)))
                 //.andExpect(jsonPath("$.description", is("A description"))));
     }
-    /*
-    @Test
-    public void test_coordinacion_delete(){
-        CoordinacionController cc= new CoordinacionController();
-        ResponseEntity<Coordinacion> delete_prueba=cc.get("1");
-        Assert.assertNotEquals(HttpStatus.NOT_FOUND,delete_prueba.getStatusCode());
-        Assert.assertNotEquals(HttpStatus.UNAUTHORIZED,delete_prueba.getStatusCode());
-        Assert.assertNotEquals(HttpStatus.UNSUPPORTED_MEDIA_TYPE,delete_prueba.getStatusCode());
-    }
-    */
+*/
 }
